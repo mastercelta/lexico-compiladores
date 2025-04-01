@@ -1,22 +1,169 @@
 # Explicación del Código Paso a Paso
 
-| Paso | Descripción | Función o Método Implementado | Fragmento de Código | Captura / Resultado | Observaciones |
-|------|-------------|-------------------------------|----------------------|----------------------|---------------|
-| 1 | Se importa el módulo `fs` para trabajar con archivos. | `require('fs')` | `const fs = require('fs');` | - | Es necesario para leer el archivo fuente. |
-| 2 | Se intenta importar `cli-table3` para mostrar tablas bonitas. Si falla, se usa tabla básica. | `require('cli-table3')` con `try/catch` | `let Table; let tieneCliTable = true; try { Table = require('cli-table3'); } catch (e) { ... }` | Advertencia en consola si no está instalado. | Permite flexibilidad y mejora la presentación. |
-| 3 | Se recibe el nombre del archivo fuente desde los argumentos de la terminal. | `process.argv[2]` | `const archivo = process.argv[2];` | Recibe por ejemplo: `codigofuente.ts` | Si no se pasa o no existe, lanza error. |
-| 4 | Validación de existencia del archivo fuente. | `fs.existsSync` | `if (!fs.existsSync(archivo)) { ... }` | Error: "Archivo no encontrado" ![Captura de tokens](./screenshots/1.png)     | Asegura que el archivo exista antes de continuar. |
-| 5 | Se lee el archivo fuente y se divide en líneas. | `fs.readFileSync`, `split('\n')` | `const code = fs.readFileSync(archivo, 'utf-8'); const lines = code.split('\n');` | Arreglo de líneas de código. | Fundamental para recorrer el código línea por línea. |
-| 6 | Definición de palabras clave, tipos, operadores y delimitadores | Arrays | ``` const keywords = ['let', 'const', 'var', 'function', 'interface', 'enum', 'return', 'throw', 'if', 'else', 'typeof']; const types = ['number', 'string', 'boolean', 'void', 'any', 'unknown', 'never']; const operators = ['=', '==', '===', '!=', '!==', '<', '>', '<=', '>=', '+', '-', '*', '/', '%', '&&', '\\|\\|', '!', ':', '=>', '.']; const delimiters = [';', ',', '(', ')', '{', '}', '[', ']']; ``` | Utilizado para clasificar tokens |
-| 7 | Tokenización con expresión regular | `RegExp.match()` | ``` const regex = /"(.*?)"\\|'(.*?)'\\|[A-Za-z_][\w]*\\|\d+\.\d+\\|\d+\\|==\\|===\\|!=\\|!==\\|<=\\|>=\\|=>\\|[+\-*/%=!<>&\\|.:;,()[\]{}]/g; const matches = line.match(regex);``` | Extrae los tokens crudos de una línea |
-| 8 | Clasificación de tokens | Condicionales `if` | ```js if (keywords.includes(token)) type = 'Keyword';else if (types.includes(token)) type = 'Type';\nelse if (operators.includes(token)) type = 'Operator';\nelse if (delimiters.includes(token)) type = 'Delimiter';\nelse if (/^\d+(\.\d+)?$/.test(token)) type = 'Number';else if (/^".*"$\\|^'.*'$/.test(token)) type = 'String';``` | Clasifica cada token según tipo |
-| 9 | Construcción de la tabla de símbolos | Condiciones y extracción de datos | ```javascript if ((token === 'let' \\|\\| token === 'const' \\|\\| token === 'var') && /^[A-Za-z_]\w*$/.testmatches[i + 1])) {  const name = matches[i + 1];  const nextTypeIndex = matches.indexOf(':', i + 1);  const declaredType = nextTypeIndex !== -1 ? matches[nextTypeIndex + 1] : 'unknown';  symbolTable.push({ name, dataType: declaredType, tokenType: 'Variable', line: lineNumber });}``` | Detecta variables y tipos declarados |
-| 10 | Detección de funciones, interfaces y enums | Condicionales similares | ```if (token === 'function' && /^[A-Za-z_]\w*$/.test(matches[i + 1])) { symbolTable.push({ name: matches[i + 1], dataType: 'function', tokenType: 'Function', line: lineNumber });} if (token === 'interface' && /^[A-Za-z_]\w*$/.test(matches[i + 1])) { symbolTable.push({ name: matches[i + 1], dataType: 'interface', tokenType: 'Structure', line: lineNumber });} if (token === 'enum' && /^[A-Za-z_]\w*$/.test(matches[i + 1])) {  symbolTable.push({ name: matches[i + 1], dataType: 'enum', tokenType: 'Structure', line: lineNumber });``` | Agrega elementos a la tabla de símbolos |
-| 11 | Se definen las listas de palabras clave, tipos, operadores y delimitadores. | Constantes en arrays | `const keywords = [...]`, `const types = [...]` | - | Sirve como base para clasificar tokens. |
-| 12 | Se inicializan las estructuras para tokens y tabla de símbolos. | `[]` vacíos | `const tokens = []; const symbolTable = [];` | - | Acumulan los resultados del análisis. |
-| 13 | Se recorre cada línea y se aplica una expresión regular para extraer tokens. | `match(regex)` | `const regex = /"(.*?)"|.../g; const matches = line.match(regex);` | Tokens crudos de cada línea | Maneja strings, números, identificadores, símbolos, etc. |
-| 14 | Se clasifica cada token según su tipo (Keyword, Type, Operator, etc). | Condiciones con `includes`, regex | `if (keywords.includes(token)) ...` | Lista con tipo, valor y línea | Clasificación fundamental del análisis léxico. |
-| 15 | Se construye la tabla de símbolos detectando variables, funciones, interfaces y enums. | Condicionales en loop | `if (token === 'let' ...) { ... }` | Datos guardados: nombre, tipo, línea | Se identifica si es Variable, Function o Structure. |
-| 16 | Se imprime la tabla de tokens, con o sin `cli-table3`. | `console.log` o `tokenTable.toString()` | `if (tieneCliTable) { ... } else { ... }` | Tabla con bordes o alineada con tabs | Adapta el formato según disponibilidad. |
-| 17 | Se imprime la tabla de símbolos, con o sin `cli-table3`. | `console.log` o `symbolTableOutput.toString()` | `if (tieneCliTable) { ... } else { ... }` | Tabla con info de identificadores y funciones | Misma lógica adaptable que con los tokens. |
 
+<table>
+  <thead>
+    <tr>
+      <th>Paso</th>
+      <th>Descripción</th>
+      <th>Función o Método</th>
+      <th>Fragmento de Código</th>
+      <th>Captura / Resultado</th>
+      <th>Observaciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Se importa el módulo <code>fs</code> para trabajar con archivos.</td>
+      <td><code>require('fs')</code></td>
+      <td><code>const fs = require('fs');</code></td>
+      <td>-</td>
+      <td>Es necesario para leer el archivo fuente.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Se intenta importar <code>cli-table3</code>. Si falla, se usa tabla básica.</td>
+      <td><code>require('cli-table3')</code> con <code>try/catch</code></td>
+      <td><code>let Table; let tieneCliTable = true; try { Table = require('cli-table3'); } catch (e) { ... }</code></td>
+      <td>Advertencia si no está instalado</td>
+      <td>Permite flexibilidad y mejora visual.</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Obtiene el archivo desde los argumentos de la terminal.</td>
+      <td><code>process.argv[2]</code></td>
+      <td><code>const archivo = process.argv[2];</code></td>
+      <td>Ej: codigofuente.ts</td>
+      <td>Valida si se pasó un archivo.</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Verifica si el archivo existe.</td>
+      <td><code>fs.existsSync</code></td>
+      <td><code>if (!fs.existsSync(archivo)) { ... }</code></td>
+      <td>Mensaje de error</td>
+      <td>Evita errores de lectura.</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Lee y divide el contenido en líneas.</td>
+      <td><code class="language-javascript">fs.readFileSync</code>, <code>split('\n')</code></td>
+      <td><code class="language-javascript">const code = fs.readFileSync(...); const lines = code.split('\n');</code></td>
+      <td>Arreglo de líneas</td>
+      <td>Base para el análisis.</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Define palabras clave, tipos, operadores y delimitadores.</td>
+      <td>Arrays</td>
+      <td>
+<pre><code class="language-javascript">const keywords = ['let', 'const', 'var', 'function', ...];
+const types = ['number', 'string', ...];
+const operators = ['=', '+', '-', '*', '/', ...];
+const delimiters = [';', ',', '(', ')', '{', '}'];</code></pre>
+      </td>
+      <td>-</td>
+      <td>Para clasificar tokens.</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Tokeniza con expresión regular.</td>
+      <td><code>RegExp.match()</code></td>
+      <td>
+<pre><code>const regex = /"(.*?)"|...|[+\-*/%=!<>&|.:;,()[\]{}]/g;
+const matches = line.match(regex);</code></pre>
+      </td>
+      <td>Tokens crudos</td>
+      <td>Extrae componentes de la línea.</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>Clasifica los tokens según tipo.</td>
+      <td><code>if/else</code></td>
+      <td>
+<pre><code>if (keywords.includes(token)) type = 'Keyword';
+else if (types.includes(token)) type = 'Type';
+else if (operators.includes(token)) type = 'Operator';
+else if (delimiters.includes(token)) type = 'Delimiter';
+else if (/^\d+(\.\d+)?$/.test(token)) type = 'Number';
+else if (/^".*"$|^'.*'$/.test(token)) type = 'String';</code></pre>
+      </td>
+      <td>Tokens clasificados</td>
+      <td>Detecta tipo de cada token.</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>Crea la tabla de símbolos con datos de variables.</td>
+      <td><code>symbolTable.push</code></td>
+      <td>
+<pre><code>if (token === 'let' && matches[i + 1]) {
+  symbolTable.push({...});
+}</code></pre>
+      </td>
+      <td>-</td>
+      <td>Guarda nombre, tipo, línea.</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>Detecta funciones, interfaces y enums.</td>
+      <td>Condicionales similares</td>
+      <td>
+<pre><code>if (token === 'function') { symbolTable.push(...); }
+if (token === 'interface') { symbolTable.push(...); }
+if (token === 'enum') { symbolTable.push(...); }</code></pre>
+      </td>
+      <td>-</td>
+      <td>Agrega estructuras a la tabla.</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>Muestra el resultado de tokens </td>
+      <td><code>console.log</code> o <code>table.toString()</code></td>
+      <td><code>if (tieneCliTable) {
+    const tokenTable = new Table({ head: ['Tipo', 'Valor', 'Línea'], style: { head: ['cyan'] } });
+    tokens.forEach(t => tokenTable.push([t.type, t.value, t.line]));
+    console.log('\nTokens detectados:\n');
+    console.log(tokenTable.toString());
+} else {
+    console.log('\nTokens detectados:\n');
+    console.log('Tipo\t\tValor\t\tLínea');
+    tokens.forEach(t => {
+        const tType = t.type.padEnd(10);
+        const tVal = t.value.padEnd(10);
+        console.log(`${tType}\t${tVal}\t${t.line}`);
+    });
+}</code></td>
+      <td>Tabla en consola</td>
+      <td>Usa formato visual si está instalado.</td>
+    </tr>
+   <tr>
+      <td>12</td>
+      <td>Muestra los resultados simbolicos</td>
+      <td><code>console.log</code> o <code>table.toString()</code></td>
+      <td><code>if (tieneCliTable) {
+    const tokenTable = new Table({ head: ['Tipo', 'Valor', 'Línea'], style: { head: ['cyan'] } });
+    tokens.forEach(t => tokenTable.push([t.type, t.value, t.line]));
+    console.log('\nTokens detectados:\n');
+    console.log(tokenTable.toString());
+} else {
+    console.log('\nTokens detectados:\n');
+    console.log('Tipo\t\tValor\t\tLínea');
+    tokens.forEach(t => {
+        const tType = t.type.padEnd(10);
+        const tVal = t.value.padEnd(10);
+        console.log(`${tType}\t${tVal}\t${t.line}`);
+    });
+}</code></td>
+      <td>Tabla en consola</td>
+      <td>Usa formato visual si está instalado.</td>
+    </tr>
+  </tbody>
+</table>
+
+### Capturas de Ejemplo
+
+| ![](./screenshots/1.png) | ![](./screenshots/2.png) | ![](./screenshots/3.png) |
+|--------------------------|--------------------------|--------------------------|
+| ![](./screenshots/4.png) | ![](./screenshots/5.png) | ![](./screenshots/6.png) |
+| ![](./screenshots/7.png) | ![](./screenshots/8.png) | ![](./screenshots/9.png) |
