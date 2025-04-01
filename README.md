@@ -42,7 +42,11 @@ cd lexico-compiladores
 ```
 ### 2. Instalar dependencias
 
-Sin ninguna dependencia adicional, ya que el proyecto utiliza solo módulos nativos de Node.js.
+Asegúrate de tener [Node.js](https://nodejs.org/) instalado. Luego, instala las dependencias necesarias ejecutando:
+
+```bash
+npm install cli-table3
+```
 
 ## Ejecución
 
