@@ -7,29 +7,11 @@
 | 3 | Se recibe el nombre del archivo fuente desde los argumentos de la terminal. | `process.argv[2]` | `const archivo = process.argv[2];` | Recibe por ejemplo: `codigofuente.ts` | Si no se pasa o no existe, lanza error. |
 | 4 | Validación de existencia del archivo fuente. | `fs.existsSync` | `if (!fs.existsSync(archivo)) { ... }` | Error: "Archivo no encontrado" ![Captura de tokens](./screenshots/1.png)     | Asegura que el archivo exista antes de continuar. |
 | 5 | Se lee el archivo fuente y se divide en líneas. | `fs.readFileSync`, `split('\n')` | `const code = fs.readFileSync(archivo, 'utf-8'); const lines = code.split('\n');` | Arreglo de líneas de código. | Fundamental para recorrer el código línea por línea. |
-| 6 | Definición de palabras clave, tipos, operadores y delimitadores | Arrays | ```js const keywords = ['let', 'const', 'var', 'function', 'interface', 'enum', 'return', 'throw', 'if', 'else', 'typeof']; const types = ['number', 'string', 'boolean', 'void', 'any', 'unknown', 'never']; const operators = ['=', '==', '===', '!=', '!==', '<', '>', '<=', '>=', '+', '-', '*', '/', '%', '&&', '\\|\\|', '!', ':', '=>', '.']; const delimiters = [';', ',', '(', ')', '{', '}', '[', ']']; ``` | Utilizado para clasificar tokens |
-| 7 | Tokenización con expresión regular | `RegExp.match()` | ```js const regex = /"(.*?)"\\|'(.*?)'\\|[A-Za-z_][\w]*\\|\d+\.\d+\\|\d+\\|==\\|===\\|!=\\|!==\\|<=\\|>=\\|=>\\|[+\-*/%=!<>&\\|.:;,()[\]{}]/g; const matches = line.match(regex);``` | Extrae los tokens crudos de una línea |
-| 8 | Clasificación de tokens | Condicionales `if` | ```js if (keywords.includes(token)) type = 'Keyword';\n else if (types.includes(token)) type = 'Type';\nelse if (operators.includes(token)) type = 'Operator';\nelse if (delimiters.includes(token)) type = 'Delimiter';\nelse if (/^\d+(\.\d+)?$/.test(token)) type = 'Number';\n else if (/^".*"$\\|^'.*'$/.test(token)) type = 'String';``` | Clasifica cada token según tipo |
-| 9 | Construcción de la tabla de símbolos | Condiciones y extracción de datos | ```js
-if ((token === 'let' || token === 'const' || token === 'var') && /^[A-Za-z_]\w*$/.test(matches[i + 1])) {
-  const name = matches[i + 1];
-  const nextTypeIndex = matches.indexOf(':', i + 1);
-  const declaredType = nextTypeIndex !== -1 ? matches[nextTypeIndex + 1] : 'unknown';
-  symbolTable.push({ name, dataType: declaredType, tokenType: 'Variable', line: lineNumber });
-}
-``` | Detecta variables y tipos declarados |
-| 10 | Detección de funciones, interfaces y enums | Condicionales similares | ```js
-if (token === 'function' && /^[A-Za-z_]\w*$/.test(matches[i + 1])) {
-  symbolTable.push({ name: matches[i + 1], dataType: 'function', tokenType: 'Function', line: lineNumber });
-}
-if (token === 'interface' && /^[A-Za-z_]\w*$/.test(matches[i + 1])) {
-  symbolTable.push({ name: matches[i + 1], dataType: 'interface', tokenType: 'Structure', line: lineNumber });
-}
-if (token === 'enum' && /^[A-Za-z_]\w*$/.test(matches[i + 1])) {
-  symbolTable.push({ name: matches[i + 1], dataType: 'enum', tokenType: 'Structure', line: lineNumber });
-}
-``` | Agrega elementos a la tabla de símbolos |
-
+| 6 | Definición de palabras clave, tipos, operadores y delimitadores | Arrays | ``` const keywords = ['let', 'const', 'var', 'function', 'interface', 'enum', 'return', 'throw', 'if', 'else', 'typeof']; const types = ['number', 'string', 'boolean', 'void', 'any', 'unknown', 'never']; const operators = ['=', '==', '===', '!=', '!==', '<', '>', '<=', '>=', '+', '-', '*', '/', '%', '&&', '\\|\\|', '!', ':', '=>', '.']; const delimiters = [';', ',', '(', ')', '{', '}', '[', ']']; ``` | Utilizado para clasificar tokens |
+| 7 | Tokenización con expresión regular | `RegExp.match()` | ``` const regex = /"(.*?)"\\|'(.*?)'\\|[A-Za-z_][\w]*\\|\d+\.\d+\\|\d+\\|==\\|===\\|!=\\|!==\\|<=\\|>=\\|=>\\|[+\-*/%=!<>&\\|.:;,()[\]{}]/g; const matches = line.match(regex);``` | Extrae los tokens crudos de una línea |
+| 8 | Clasificación de tokens | Condicionales `if` | ```js if (keywords.includes(token)) type = 'Keyword';else if (types.includes(token)) type = 'Type';\nelse if (operators.includes(token)) type = 'Operator';\nelse if (delimiters.includes(token)) type = 'Delimiter';\nelse if (/^\d+(\.\d+)?$/.test(token)) type = 'Number';else if (/^".*"$\\|^'.*'$/.test(token)) type = 'String';``` | Clasifica cada token según tipo |
+| 9 | Construcción de la tabla de símbolos | Condiciones y extracción de datos | ```if ((token === 'let' \\|\\| token === 'const' \\|\\| token === 'var') && /^[A-Za-z_]\w*$/.testmatches[i + 1])) {  const name = matches[i + 1];  const nextTypeIndex = matches.indexOf(':', i + 1);  const declaredType = nextTypeIndex !== -1 ? matches[nextTypeIndex + 1] : 'unknown';  symbolTable.push({ name, dataType: declaredType, tokenType: 'Variable', line: lineNumber });}``` | Detecta variables y tipos declarados |
+| 10 | Detección de funciones, interfaces y enums | Condicionales similares | ```if (token === 'function' && /^[A-Za-z_]\w*$/.test(matches[i + 1])) { symbolTable.push({ name: matches[i + 1], dataType: 'function', tokenType: 'Function', line: lineNumber });} if (token === 'interface' && /^[A-Za-z_]\w*$/.test(matches[i + 1])) { symbolTable.push({ name: matches[i + 1], dataType: 'interface', tokenType: 'Structure', line: lineNumber });} if (token === 'enum' && /^[A-Za-z_]\w*$/.test(matches[i + 1])) {  symbolTable.push({ name: matches[i + 1], dataType: 'enum', tokenType: 'Structure', line: lineNumber });``` | Agrega elementos a la tabla de símbolos |
 | 11 | Se definen las listas de palabras clave, tipos, operadores y delimitadores. | Constantes en arrays | `const keywords = [...]`, `const types = [...]` | - | Sirve como base para clasificar tokens. |
 | 12 | Se inicializan las estructuras para tokens y tabla de símbolos. | `[]` vacíos | `const tokens = []; const symbolTable = [];` | - | Acumulan los resultados del análisis. |
 | 13 | Se recorre cada línea y se aplica una expresión regular para extraer tokens. | `match(regex)` | `const regex = /"(.*?)"|.../g; const matches = line.match(regex);` | Tokens crudos de cada línea | Maneja strings, números, identificadores, símbolos, etc. |
