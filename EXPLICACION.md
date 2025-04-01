@@ -8,15 +8,8 @@
 | 4 | Validación de existencia del archivo fuente. | `fs.existsSync` | `if (!fs.existsSync(archivo)) { ... }` | Error: "Archivo no encontrado" ![Captura de tokens](./screenshots/1.png)     | Asegura que el archivo exista antes de continuar. |
 | 5 | Se lee el archivo fuente y se divide en líneas. | `fs.readFileSync`, `split('\n')` | `const code = fs.readFileSync(archivo, 'utf-8'); const lines = code.split('\n');` | Arreglo de líneas de código. | Fundamental para recorrer el código línea por línea. |
 | 6 | Definición de palabras clave, tipos, operadores y delimitadores | Arrays | ```js const keywords = ['let', 'const', 'var', 'function', 'interface', 'enum', 'return', 'throw', 'if', 'else', 'typeof']; const types = ['number', 'string', 'boolean', 'void', 'any', 'unknown', 'never']; const operators = ['=', '==', '===', '!=', '!==', '<', '>', '<=', '>=', '+', '-', '*', '/', '%', '&&', '\\|\\|', '!', ':', '=>', '.']; const delimiters = [';', ',', '(', ')', '{', '}', '[', ']']; ``` | Utilizado para clasificar tokens |
-| 7 | Tokenización con expresión regular | `RegExp.match()` | ```js const regex = /"(.*?)"\\|'(.*?)'|[A-Za-z_][\w]*\\|\d+\.\d+\\|\d+\\|==\\|===\\|!=\\|!==\\|<=\\|>=\\|=>\\|[+\-*/%=!<>&\\|.:;,()[\]{}]/g; const matches = line.match(regex);``` | Extrae los tokens crudos de una línea |
-| 8 | Clasificación de tokens | Condicionales `if` | ```js
-if (keywords.includes(token)) type = 'Keyword';
-else if (types.includes(token)) type = 'Type';
-else if (operators.includes(token)) type = 'Operator';
-else if (delimiters.includes(token)) type = 'Delimiter';
-else if (/^\d+(\.\d+)?$/.test(token)) type = 'Number';
-else if (/^".*"$|^'.*'$/.test(token)) type = 'String';
-``` | Clasifica cada token según tipo |
+| 7 | Tokenización con expresión regular | `RegExp.match()` | ```js const regex = /"(.*?)"\\|'(.*?)'\\|[A-Za-z_][\w]*\\|\d+\.\d+\\|\d+\\|==\\|===\\|!=\\|!==\\|<=\\|>=\\|=>\\|[+\-*/%=!<>&\\|.:;,()[\]{}]/g; const matches = line.match(regex);``` | Extrae los tokens crudos de una línea |
+| 8 | Clasificación de tokens | Condicionales `if` | ```js if (keywords.includes(token)) type = 'Keyword';\n else if (types.includes(token)) type = 'Type';\nelse if (operators.includes(token)) type = 'Operator';\nelse if (delimiters.includes(token)) type = 'Delimiter';\nelse if (/^\d+(\.\d+)?$/.test(token)) type = 'Number';\n else if (/^".*"$\\|^'.*'$/.test(token)) type = 'String';``` | Clasifica cada token según tipo |
 | 9 | Construcción de la tabla de símbolos | Condiciones y extracción de datos | ```js
 if ((token === 'let' || token === 'const' || token === 'var') && /^[A-Za-z_]\w*$/.test(matches[i + 1])) {
   const name = matches[i + 1];
