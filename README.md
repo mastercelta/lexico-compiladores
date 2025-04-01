@@ -44,6 +44,8 @@ cd lexico-compiladores
 
 Asegúrate de tener [Node.js](https://nodejs.org/) instalado. Luego, instala las dependencias necesarias ejecutando:
 
+Esta dependencia es opcional para ver la tabla mas bonita, si no tiene la dependencia, imprime una tabla sin formato.
+
 ```bash
 npm install cli-table3
 ```
