@@ -7,12 +7,7 @@
 | 3 | Se recibe el nombre del archivo fuente desde los argumentos de la terminal. | `process.argv[2]` | `const archivo = process.argv[2];` | Recibe por ejemplo: `codigofuente.ts` | Si no se pasa o no existe, lanza error. |
 | 4 | Validación de existencia del archivo fuente. | `fs.existsSync` | `if (!fs.existsSync(archivo)) { ... }` | Error: "Archivo no encontrado" ![Captura de tokens](./screenshots/1.png)     | Asegura que el archivo exista antes de continuar. |
 | 5 | Se lee el archivo fuente y se divide en líneas. | `fs.readFileSync`, `split('\n')` | `const code = fs.readFileSync(archivo, 'utf-8'); const lines = code.split('\n');` | Arreglo de líneas de código. | Fundamental para recorrer el código línea por línea. |
-| 6 | Definición de palabras clave, tipos, operadores y delimitadores | Arrays | ```js
-const keywords = ['let', 'const', 'var', 'function', 'interface', 'enum', 'return', 'throw', 'if', 'else', 'typeof'];
-const types = ['number', 'string', 'boolean', 'void', 'any', 'unknown', 'never'];
-const operators = ['=', '==', '===', '!=', '!==', '<', '>', '<=', '>=', '+', '-', '*', '/', '%', '&&', '||', '!', ':', '=>', '.'];
-const delimiters = [';', ',', '(', ')', '{', '}', '[', ']'];
-``` | Utilizado para clasificar tokens |
+| 6 | Definición de palabras clave, tipos, operadores y delimitadores | Arrays | ```js const keywords = ['let', 'const', 'var', 'function', 'interface', 'enum', 'return', 'throw', 'if', 'else', 'typeof']; const types = ['number', 'string', 'boolean', 'void', 'any', 'unknown', 'never']; const operators = ['=', '==', '===', '!=', '!==', '<', '>', '<=', '>=', '+', '-', '*', '/', '%', '&&', '||', '!', ':', '=>', '.']; const delimiters = [';', ',', '(', ')', '{', '}', '[', ']']; ``` | Utilizado para clasificar tokens |
 | 7 | Tokenización con expresión regular | `RegExp.match()` | ```js
 const regex = /"(.*?)"|'(.*?)'|[A-Za-z_][\w]*|\d+\.\d+|\d+|==|===|!=|!==|<=|>=|=>|[+\-*/%=!<>&|.:;,()[\]{}]/g;
 const matches = line.match(regex);
