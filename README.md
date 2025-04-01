@@ -12,9 +12,11 @@
 ## Descripción del Proyecto
 
 **Taller 3** del curso **Compiladores**.  
-El objetivo es desarrollar un programa en JavaScript (Node.js) que realice un **análisis léxico** de un fragmento de código fuente almacenado en un archivo independiente. El analizador identifica y clasifica **tokens** como:
+El objetivo es desarrollar un programa en JavaScript (Node.js) que realice un **análisis léxico** de un fragmento de código fuente almacenado en un archivo independiente en TypeScript. El analizador identifica y clasifica **tokens** como:
 
-- Palabras clave (`int`, `float`, `string`, `if`, `while`, `return`, `void`)
+- Palabras clave (`let`, `if`, `else`, `while`, `for`, `function`)
+- Tipos de datos (`number`, `string`, `boolean`, `void`)
+- Estructuras de control (`if`, `else`, `while`, `for`, `etc.`)
 - Identificadores (variables y funciones)
 - Operadores (`+`, `-`, `*`, `/`, `=`, `>`, `<`, `==`)
 - Delimitadores (`;`, `{`, `}`, `(`, `)`)
@@ -61,3 +63,15 @@ El archivo de entrada (por ejemplo, `codigofuente.js`) debe contener el código 
 ```bash
 node analizador.js codigofuente.js
 ```
+
+## Explicación del Código Paso a Paso
+
+| Paso | Descripción | Función o Método | Fragmento de Código | Captura / Resultado | Observaciones |
+|------|-------------|------------------|----------------------|----------------------|---------------|
+| 1 | Leer archivo fuente desde línea de comandos | `fs.readFileSync` + `process.argv` | `const archivo = process.argv[2] || 'codigofuente.ts';` | Código cargado exitosamente | Se incluye validación si no existe |
+| 2 | Dividir el contenido en líneas | `split('\n')` | `const lines = code.split('\n');` | Array de líneas | - |
+| 3 | Tokenizar cada línea con expresión regular | `match(regex)` | `/"(.*?)"|...|[+\-*/%=!<>&|.:;,()[\]{}]/g` | Tokens detectados | Regex adaptado para múltiples casos |
+| 4 | Clasificar tokens: keyword, identificador, operador, etc. | `if` conditions | `if (keywords.includes(token)) ...` | Lista de tokens clasificados | - |
+| 5 | Construir tabla de símbolos | Condicionales en loop | `if (token === 'let' ...)` | Variables y funciones registradas | Mejorable con un parser real |
+| 6 | Mostrar tokens en tabla | `cli-table3` o `console.log` | `console.log(tokenTable.toString())` | Tabla en consola | Usa fallback si no está instalado |
+| 7 | Mostrar tabla de símbolos | `cli-table3` o `console.log` | `console.log(symbolTableOutput.toString())` | Tabla en consola | Igual que anterior |
